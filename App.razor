@@ -1,0 +1,107 @@
+﻿<div style="max-width: 900px; margin: auto; padding: 24px; display: flex; flex-direction: column; gap: 24px;">
+    <div style="display: flex; flex-direction: row; gap: 24px;">
+        <div>
+            <p>Y 軸ラベルの位置を変更</p>
+            <IgbRadioGroup Alignment="RadioGroupAlignment.Horizontal"
+                           @bind-Value="_selectYLabelLocation"
+                           @bind-Value:after="OnYLabelLocationChanged">
+                <IgbRadio Value="OutsideLeft">Outside Left</IgbRadio>
+                <IgbRadio Value="OutsideRight">Outside Right</IgbRadio>
+            </IgbRadioGroup>
+        </div>
+        <div>
+            <p>X 軸ラベルの位置を変更</p>
+            <IgbRadioGroup Alignment="RadioGroupAlignment.Horizontal"
+                           @bind-Value="_selectXLabelLocation"
+                           @bind-Value:after="OnXLabelLocationChanged">
+                <IgbRadio Value="OutsideBottom">Outside Bottom</IgbRadio>
+                <IgbRadio Value="OutsideTop">Outside Top</IgbRadio>
+            </IgbRadioGroup>
+        </div>
+    </div>
+    <IgbLegend @ref="_legend"></IgbLegend>
+
+    <IgbDataChart @ref="grid" Width="100%"
+                  Height="300px"
+                  Legend="_legend"
+                  ComputedPlotAreaMarginMode="ComputedPlotAreaMarginMode.Series">
+        <IgbCategoryXAxis Name="xAxis"
+                          DataSource="_data"
+                          Label="@nameof(DataItem.Index)"
+                          MajorStroke="1"
+                          LabelLocation="@_xLabelLocation"/>        
+        <IgbNumericYAxis Name="yAxis"
+                         MinimumValue="10"
+                         MaximumValue="16"
+                         Interval="1"
+                         LabelLocation="@_yLabelLocation"/>
+        <IgbLineSeries Title="Sample Data"
+                       DataSource="_data"
+                       XAxisName="xAxis"
+                       YAxisName="yAxis"
+                       ValueMemberPath="@nameof(DataItem.Value)">
+        </IgbLineSeries>
+    </IgbDataChart>
+</div>
+
+@code {
+    private IgbDataChart? grid;
+    private string _selectYLabelLocation = "OutsideLeft";
+    private AxisLabelsLocation _yLabelLocation = AxisLabelsLocation.OutsideLeft;
+
+    private string _selectXLabelLocation = "OutsideBottom";
+    private AxisLabelsLocation _xLabelLocation = AxisLabelsLocation.OutsideRight;
+
+    private void OnYLabelLocationChanged()
+    {
+        if (_selectYLabelLocation == "OutsideLeft")
+        {
+            _yLabelLocation = AxisLabelsLocation.OutsideLeft;
+        }
+        else if (_selectYLabelLocation == "OutsideRight")
+        {
+            _yLabelLocation = AxisLabelsLocation.OutsideRight;
+        }
+        grid?.NotifyClearItems(_data);
+    }
+
+    private void OnXLabelLocationChanged()
+    {
+        if (_selectXLabelLocation == "OutsideBottom")
+        {
+            _xLabelLocation = AxisLabelsLocation.OutsideBottom;
+        }
+        else if (_selectXLabelLocation == "OutsideTop")
+        {
+            _xLabelLocation = AxisLabelsLocation.OutsideTop;
+        }
+        grid?.NotifyClearItems(_data);
+    }
+
+    public class DataItem
+    {
+        public int Index { get; set; }
+        public double? Value { get; set; }
+    }
+
+    private List<DataItem> _data = new()
+    {
+        new(){ Index = 0, Value = 12 },
+        new(){ Index = 1, Value = 14 },
+        new(){ Index = 2, Value = 11 },
+        new(){ Index = 3, Value = 13 },
+        new(){ Index = 4, Value = 15 },
+        new(){ Index = 5, Value = 12 },
+        new(){ Index = 6, Value = 14 },
+    };
+
+    private IgbLegend? _legend;
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if (firstRender)
+        {
+            this.StateHasChanged();
+        }
+    }
+}
